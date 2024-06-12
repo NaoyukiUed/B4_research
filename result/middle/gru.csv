@@ -1,0 +1,1 @@
+mod,model_dict,early_stop,num_epochs,input_size,hidden_size,num_layers,num_classes,batch_size,days_num,best_accuracy,best_f1,upper_recall,upper_precision,downer_recall,downer_precision,TP,FP,FN,TN

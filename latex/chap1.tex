@@ -1,0 +1,95 @@
+\documentclass[a4paper,11pt]{ltjsarticle}
+
+
+% 数式
+\usepackage{amsmath,amsfonts}
+\usepackage{bm}
+% 画像
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage{float}
+\usepackage{ascmac}
+\usepackage{listings}
+
+%A4: 21.0 x 29.7cm
+
+
+\begin{document}
+\pagestyle{fancy}
+\lhead{}
+\chead{第1部原案}
+\rhead{\today 上田直幸}
+\cfoot{- \thepage{} -}
+
+\section{データとモデルに関する考察}
+\subsection{前提条件}
+データとして用いたものは，四本値，四本値と出来高，四本値と出来高とニュース記事のスコア，四本値と出来高とニュース記事のスコアと為替の4通りである．これらは，それぞれinput\_sizeの4,5,6,7と対応している．モデルとして用いたものは，NN，NN(2)，RNN，LSTMの4種である．
+\subsection{考察}
+\begin{table}[htbp]
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/panda_means0.tex}
+    \caption{単層NNの平均正解率，F値}
+    \label{tb:panda1}
+  \end{minipage}
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/panda_means1.tex}
+    \caption{2層NNの平均正解率，F値}
+    \label{tb:panda2}
+  \end{minipage}
+\end{table}
+\begin{table}[htbp]
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/panda_means2.tex}
+    \caption{RNNの平均正解率，F値}
+    \label{tb:panda3}
+  \end{minipage}
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/panda_means3.tex}
+    \caption{LSTMの平均正解率，F値}
+    \label{tb:panda4}
+  \end{minipage}
+\end{table}
+\subsubsection{データに関する考察}
+\paragraph{出来高の有無の比較}
+input\_sizeが4の場合と，5の場合を比較する．今回用いた4通りのモデルに対して，4つのモデルのうち3つのモデルで平均0.91\%のbest\_accuracyの向上が見られた．また，4つのモデルのうち3つのモデルで平均0.67のbest\_f1の向上が見られた．このことから出来高をデータに加えることで，予測精度の向上が見られたと言える．
+
+これは，取引量の多い日にはサンプル数が増え，データの予測がしやすくなったことが理由として考えられる．
+\paragraph{ニュースデータの有無の比較}
+input\_sizeが5の場合と6の場合を比較する．今回用いた4通りのモデルに対して，4つのモデルすべてにおいて，平均0.62\%のbest\_accuracyの向上が見られた．また，4つのモデルのうち2つのモデルで，平均0.02のbest\_f1の向上が見られた．このことから，ニュースデータを予測データに加えることで，予測精度の向上が見られたといえる．
+
+これは，株式を売買する人が株を売買するにあたり，ニュース記事のデータを参考にしているためニュース記事の影響が出ていることが理由として考えられる．
+
+\paragraph{為替データの有無の比較}
+input\_sizeが6の場合と7の場合を比較する．今回用いた4通りのモデルに対して，NNを用いたモデルに対してのみ，平均0.55\%のbest\_accuracyの向上が見られ，RNNやLSTMなどの時系列データを扱うモデルに対しては，0.75\%の精度の減少がみられた．このことから，為替データは時系列データを得意としないデータに対して用いられたとき予測精度が向上しているといえる．
+
+これは，為替データは1日や2日でそこまで大きく変わるものではなく，また，為替データが影響を与えるとしても，輸出入量や，業界によって為替データの影響の受け方が異なるので，今回，企業を細かく分類できていない状態で為替データを時系列的に扱ったため，精度が下がったのではないかと考えられる．また一方で，為替データを時系列的に扱わなかったことによって精度が向上した原因としては，為替が日本国内の景気を反映しているため，長期的な視点で見た時に，景気がいい時には株価が上がりやすいなどの特徴を学習することができたことが理由として考えられる．
+
+\subsubsection{モデルに関する考察}
+\paragraph{NN,NN(2)とRNN,LSTMの比較}
+NN,NN(2)とRNN，LSTMを比較すると，input\_sizeが，4,5,7の時に，NN,NN(2)のほうが精度がよく，input\_sizeが6の時に，RNN,LSTMのほうが精度がよくなっている．だが一方で最も精度が良かったのはRNN,LSTMを用いて，四本値，出来高，Newsのデータを用いた時でその時の予測精度は52.39\%であった．このことから，株価の予測を行うのに適したデータは，LSTMやRNNなどの時系列を扱うことを得意とするモデルであるが，その日ごとの特徴を表すデータを適切に与えなければ精度は向上しないことがわかる．しかしながら，NNを用いて学習した場合でも，四本値，出来高，News，為替のデータを用いた時の予測精度が，RNN,LSTMにおいての最高の予測精度より0.19\%しか下がっていないため，今回のデータセットを用いた株価予測において，株を時系列データとして扱っても，そうでなくても，それほど大きな違いはないものと考えられる．
+\begin{table}[htbp]
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/normal_data.tex}
+    \caption{NN,NN(2)の平均正解率，F値}
+    \label{tb:NN}
+  \end{minipage}
+  \begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \input{figure/reccurent_data_omit.tex}
+    \caption{RNN,LSTMの平均正解率，F値}
+    \label{tb:RNN}
+  \end{minipage}
+\end{table}
+\paragraph{RNNとLSTMの比較}
+LSTM(表\ref{tb:panda4})は，RNN(表\ref{tb:panda3})の改善版であり，より長期の依存関係を保持することができるように改良されたものである．表\ref{tb:panda3}と表\ref{tb:panda4}を比較すると，input\_sizeが4の場合はRNNの方が予測精度がよく，input\_sizeが5,6,7の場合はLSTMの方が精度がよくなっている．今回は，データとして5日分のデータを使っており，そこまで長期依存性は必要ないほどの長さではあるが，LSTMの方が精度がよくなっている．
+
+これは，LSTMの方がRNNよりもより必要な情報を取捨選択することができたということが理由として考えられる．つまり，LSTMの忘却ゲートによって，5日分のデータという短い長さであっても，長期依存性の対策になったのではないかと考えられる．
+
+\end{document}
